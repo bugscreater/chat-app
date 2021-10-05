@@ -1,0 +1,90 @@
+.card-container{
+  background: #042331 !important;
+  padding: 30px;
+  color: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px 0px #000 !important;
+}
+.link{
+    text-decoration: none;
+    color: grey;
+    font-weight: 300px;
+}
+
+.link2{
+    text-decoration: none;
+    color: black;
+    font-weight: 300px;
+}
+
+.logout{
+    font-size: 1.2rem;
+    font-weight: 500;
+    font: optional;
+    color: white;
+}
+
+.smallmsg{
+    padding: 2px;
+    margin-bottom: 3px;
+    font-style: normal;
+    color: grey;
+}
+
+.profile-image{
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    padding: 1px;
+    border: 1px solid #042331;
+    object-fit: cover;
+    background-size: 100% 100%;
+
+}
+
+.profile-pic-div{
+
+    height: 200px;
+    width: 200px;
+    left: 50%;
+    right: 50%;
+    text-align: center;
+    margin: auto;
+    border-radius: 50%;
+    background-size: 100% 100%;
+    overflow: hidden;
+   
+   
+   
+    
+}
+
+#photo{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    
+}
+
+#file{
+    color: grey;
+    width: 100%;
+}
+
+.Upload-Photo{
+    text-align: center;
+    margin: auto;
+}
+
+#inp {
+    text-align-last: center;
+    margin: auto;
+    display: none;
+
+}
+
+.choose-label{
+   
+   color: #fff;
+   padding: 2px;
+}
