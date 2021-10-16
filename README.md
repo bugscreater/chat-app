@@ -1,3 +1,28 @@
+I have developed this web app using React.js and Firebase. Some key features of the project are listed below.
+
+
+1) Personal account that allows user to sign in and sign up.
+2) Verify using email address in order to avoid fake registration.
+3) User can change their username and password regularly as they find appropriate.
+4) User can reset password in case of any mishappening.
+5) User can personalize their profile picture.
+6) Every user can connect to any other user of this application and can start conversation easily.
+7) User can share emojies to express their feelings.
+8) Users can also share images and voice notes in order to enhance their conversation.
+9) There is no expiry of older conversation, but user can delete coversation explicitly.
+10) User will get a push notification, notifing new messages and friend requests.
+This app is being updated regularly and new features are added to enhance the exprience of the user.
+
+
+
+
+
+
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
