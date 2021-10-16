@@ -12,13 +12,13 @@ importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js')
 
 
 const config = {
-    apiKey: "AIzaSyBOcPDk1k04pcFJMniL6t5F_8puAMUpKbc",
-    authDomain: "react-chat-app-c16b7.firebaseapp.com",
-    database: "https://react-chat-app-c16b7-default-rtdb.firebaseio.com/",
-    projectId:  "react-chat-app-c16b7",
-    storageBucket: "react-chat-app-c16b7.appspot.com",
-    messagingSenderId:"1092490786894",
-    appId: "1:1092490786894:web:cd873a93ce53adfed4eb1f"
+    apiKey: "",
+    authDomain: "",
+    database: "",
+    projectId:  "",
+    storageBucket: "",
+    messagingSenderId:"",
+    appId: ""
 };
 
 firebase.initializeApp(config)
