@@ -1,7 +1,6 @@
 import firebase from "firebase/app"
 import "firebase/auth"
 import 'firebase/firestore'
-import { Alert } from "react-bootstrap";
 import Firebase from "firebase";
 
 

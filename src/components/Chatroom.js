@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { firestore, firebasedb } from "../firebase";
+import firebase from "firebase";
 import { useAuth } from "../contexts/AuthContext";
 import "./chatroom.css";
 import {
@@ -19,12 +20,12 @@ import {
   keypressed,
   showEmojipanel,
   hideEmojipanel,
-  getEmoji
+  getEmoji,
+  pause,
+  record,
 } from "./chat";
-import Users from "./Users";
 import { Link } from "react-router-dom";
-import { Alert, Modal } from "react-bootstrap";
-import ReactScrollableFeed from "react-scrollable-feed";
+import { Alert } from "react-bootstrap";
 
 function Chatroom() {
   const { currentUser, Logout } = useAuth();
@@ -49,6 +50,28 @@ function Chatroom() {
           setUserid(doc.id);
           setEmail(doc.data().email);
         });
+      });
+
+    const messaging = firebase.messaging();
+
+    messaging
+      .requestPermission()
+      .then(function () {
+        return messaging.getToken();
+      })
+      .then(function (token) {
+       
+
+        if (userid !== "") {
+          firebase
+            .database()
+            .ref("fcmTokens")
+            .child(userid)
+            .set({ token_id: token });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
   getusername();
@@ -228,7 +251,7 @@ function Chatroom() {
 
                       <div className="chat-header-icon icon">
                         <i
-                          className="fas fa-paperclip"
+                          className="fas fa-image"
                           // onClick={showattachment}
                           id="attachment-paperclip"
                           onClick={chooseImage}
@@ -295,7 +318,6 @@ function Chatroom() {
                           >
                             Smiley
                           </div>
-                         
                         </div>
                       </nav>
                       <div className="tab-content" id="nav-tabContent">
@@ -304,13 +326,7 @@ function Chatroom() {
                           id="nav-home"
                           role="tabpanel"
                           aria-labelledby="nav-home-tab"
-                        >
-                         
-                        
-                         
-                         
-                        </div>
-                       
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -318,7 +334,11 @@ function Chatroom() {
                   <div className="row d-flex flex-row">
                     <div className="msg-bottom col-sm-1 col-md-1 col-1">
                       <div className="bottom-icons">
-                        <i className="far fa-smile fa-2x" onClick = {showEmojipanel} id="emoji"></i>
+                        <i
+                          className="far fa-smile fa-2x"
+                          onClick={showEmojipanel}
+                          id="emoji"
+                        ></i>
                       </div>
                     </div>
 
@@ -336,7 +356,7 @@ function Chatroom() {
                         onClick={focusinput}
                         onKeyPress={(e) => keypressed(e)}
                         spellCheck="false"
-                        onFocus = {hideEmojipanel}
+                        onFocus={hideEmojipanel}
                       ></textarea>
                       <div className="input-group-append">
                         <span className="input-group-text">
@@ -348,6 +368,13 @@ function Chatroom() {
                           <i
                             className="fas fa-microphone fa-2x"
                             id="microphone"
+                            onClick={record}
+                          ></i>
+
+                          <i
+                            className="fas fa-stop"
+                            id="pause-btn"
+                            onClick={pause}
                           ></i>
                         </span>
                       </div>
@@ -393,7 +420,10 @@ function Chatroom() {
                 </span>
               </div>
 
-              <ul className="list-group list-group-flush" id="Userslist"></ul>
+              <ul
+                className="list-group list-group-flush cursor-pointer"
+                id="Userslist"
+              ></ul>
             </div>
           </div>
         </div>

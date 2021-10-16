@@ -1,5 +1,9 @@
 import { firestore } from "../firebase";
 import { firebasedb } from "../firebase";
+import firebase from "firebase";
+import $ from "jquery";
+
+
 window.Addfriend = Addfriend;
 window.startchat = startchat;
 window.mobilechat = mobilechat;
@@ -8,19 +12,37 @@ window.getEmoji = getEmoji;
 var chatkey = "";
 var currentUserKey = "";
 var currentUser = "";
+var friend_id = "";
+var dp_url = "";
+
 
 export function toggle() {
   var blur = document.getElementById("blur");
   blur.classList.toggle("active");
 }
+function helper(lastmsgkey) {
+  if (lastmsgkey !== undefined) {
+    var db = firebasedb.ref("lastmsg").child(lastmsgkey);
 
-
+    db.get().then((doc) => {
+      if (doc.val()) {
+        var message = doc.val().msg;
+        if (document.getElementById(lastmsgkey) != null) {
+          if (message.length > 15) {
+            document.getElementById(lastmsgkey).innerHTML =
+              message.slice(0, 15) + "...";
+          } else {
+            document.getElementById(lastmsgkey).innerHTML = message;
+          }
+        }
+      }
+    });
+  }
+}
 
 export async function loadchathistory(userid) {
   currentUserKey = userid;
-
-  document.getElementById("loaduserfriends").innerHTML = "";
-
+  getuser_dp();
   firebasedb.ref("friend-list").on("value", function (lists) {
     lists.forEach(function (data) {
       var lst = data.val();
@@ -36,18 +58,13 @@ export async function loadchathistory(userid) {
       }
 
       if (friendkey !== "") {
+        document.getElementById("loaduserfriends").innerHTML = "";
+
         document.getElementById(
           "loaduserfriends"
         ).innerHTML = `  <li class="list-group-item color-grey" >
                      <input type="text" placeholder="Search or new chat" class="form-control rounded4" />
                  </li>`;
-      }
-
-      //  console.log(lst.currentuser,userid,lst.friendId);
-
-      if (friendkey !== "") {
-       
-        var lastmessage = "";
 
         firestore
           .collection("users")
@@ -56,31 +73,9 @@ export async function loadchathistory(userid) {
           .then((snapshot) => {
             var userdata = snapshot.data();
 
-           
-
-            var db = firebasedb.ref("chatMessage").child(lastmsgkey);
-
-            db.on("value", function (chats) {
-              chats.forEach(function (data) {
-                var chat = data.val();
-
-                if (chat.msg.indexOf("base64") !== -1) {
-                  lastmessage = "Open to see the image";
-                } else {
-                  lastmessage = chat.msg;
-                }
-              });
-
-              
-              
-             
-              
-
-             
-
-              document.getElementById(
-                "loaduserfriends"
-              ).innerHTML += `<li class="list-group-item list-group-item-action bg-color-1 padding-2rem" onclick="startchat('${userdata.username}', '${userdata.profilepicture}', '${userid}','${friendkey}')">
+            document.getElementById(
+              "loaduserfriends"
+            ).innerHTML += `<li class="list-group-item list-group-item-action bg-color-1 padding-2rem" onclick="startchat('${userdata.username}', '${userdata.profilepicture}', '${userid}','${friendkey}')">
                                                        <div id="friendchat" onclick="mobilechat('${userdata.username}', '${userdata.profilepicture}', '${userid}','${friendkey}')">
                                                            <div class="row">
                                                                <div class ="col-2 col-md-2 col-sm-2 p-0">
@@ -100,8 +95,8 @@ export async function loadchathistory(userid) {
                                                                        ${userdata.username}
                                                                    </div>
                                            
-                                                                   <div class ="under-name">
-                                                                       ${lastmessage.slice(0,10)}
+                                                                   <div class = "lastmessage-container" id = ${lastmsgkey}>
+                                                                       
                                                                        
                                                                    </div>
                                            
@@ -112,7 +107,8 @@ export async function loadchathistory(userid) {
                                                        </div>
                                            
                                                    </li>`;
-            });
+
+            helper(lastmsgkey);
           });
       }
     });
@@ -131,12 +127,14 @@ function LoadChatMessages(chatkey) {
       var dateTime = chat.dateTime.split(",");
       var msg = "";
 
-      if (chat.msg.indexOf("base64") !== -1) {
+      if (chat.msgtype === "image") {
         msg = `<img src = '${chat.msg}' class = "img-fluid"/>`;
-        
-      } else {
+      } else if (chat.msgtype === "audio") {
+        msg = `<audio controls id = "audio-msg">
+              <source src = ${chat.msg} type = "video/webm"/>
+        </audio>`;
+      } else if (chat.msgtype === "text") {
         msg = chat.msg;
-      
       }
 
       if (chat.currentuser === currentUserKey) {
@@ -166,7 +164,6 @@ function LoadChatMessages(chatkey) {
     if (messagediv) {
       messagediv.scrollTop = messagediv.scrollHeight;
     }
-    
   });
 }
 
@@ -174,6 +171,8 @@ export function startchat(username, profilepicture, currentuserid, userid) {
   if (window.innerWidth > 1000) {
     var friendlist = { friendId: userid, currentuser: currentuserid };
 
+    friend_id = userid;
+   
     //  Check if both the Users are already present in friend-list or not...
 
     var db = firebasedb.ref("friend-list");
@@ -247,6 +246,9 @@ export function startchat(username, profilepicture, currentuserid, userid) {
 export function mobilechat(username, profilepicture, currentuserid, userid) {
   if (window.innerWidth <= 1000) {
     var friendlist = { friendId: userid, currentuser: currentuserid };
+    friend_id = userid;
+
+   
 
     //  Create friend-list of users for mobile-width...
 
@@ -348,13 +350,6 @@ export function showrmicrophone() {
     .setAttribute("style", "flex:15 !important");
   document.getElementById("sendmessage").setAttribute("style", "display:none");
   document.getElementById("microphone").setAttribute("style", "display:block");
-
-  // document
-  //   .getElementById("Attachment")
-  //   .setAttribute("style", "display: none !important");
-  // document
-  //   .getElementById("attachment-paperclip")
-  //   .setAttribute("style", "display: block !important");
 }
 
 export function auto_grow(element) {
@@ -368,22 +363,63 @@ export function keypressed(e) {
   }
 }
 
+
+
 export function sendMessage() {
- 
   if (document.getElementById("inputmessage").value !== "") {
+   
     var chatmessage = {
       currentuser: currentUserKey,
       msg: document.getElementById("inputmessage").value,
       dateTime: new Date().toLocaleString(),
+      msgtype: "text",
     };
 
     if (chatkey !== "") {
+      firebasedb
+        .ref("lastmsg")
+        .child(chatkey)
+        .set(chatmessage, function (error) {
+          if (error) alert(error);
+        });
+
       firebasedb
         .ref("chatMessage")
         .child(chatkey)
         .push(chatmessage, function (error) {
           if (error) alert(error);
           else {
+            firebase
+              .database()
+              .ref("fcmTokens")
+              .child(friend_id)
+              .once("value")
+              .then(function (data) {
+               
+
+                if (data.val()!== null) {
+                  $.ajax({
+                    url: "https://fcm.googleapis.com/fcm/send",
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization:
+                        "key=AAAA_l2GeE4:APA91bEc4Ynqxj3iW0N0JB5vgluyZaV9RjI0n8v5C-wz99WtRQHg4SS6Df9n46ySuI8lpO9sbCG6KpUPOcaTGUgNhYT92Da6c-z6F1E3iPbcG_58RohG3CymlcTgcK-M2IWeN5CrzVmt",
+                    },
+                    data: JSON.stringify({
+                      to: data.val().token_id,
+                      data: { message: chatmessage.msg.substring(0, 30) + '...','icon':dp_url},
+                    }),
+                    success: function (response) {
+                      
+                    },
+                    error: function (xhr, status, error) {
+                      console.log(xhr.error);
+                    },
+                  });
+                }
+              });
+
             document.getElementById("inputmessage").value = "";
             document.getElementById("inputmessage").focus();
           }
@@ -486,15 +522,6 @@ export function closeUserlst() {
   close_dropdown();
 }
 
-// export function showattachment() {
-//   document
-//     .getElementById("Attachment")
-//     .setAttribute("style", "display: block !important");
-//   document
-//     .getElementById("attachment-paperclip")
-//     .setAttribute("style", "display: none !important");
-// }
-
 export function chooseImage() {
   document.getElementById("imageFile").click();
 }
@@ -513,9 +540,17 @@ export function sendImage(event) {
           currentuser: currentUserKey,
           msg: reader.result,
           dateTime: new Date().toLocaleString(),
+          msgtype: "image",
         };
 
         if (chatkey !== "") {
+          firebasedb
+            .ref("lastmsg")
+            .child(chatkey)
+            .set(chatmessage, function (error) {
+              if (error) alert(error);
+            });
+
           firebasedb
             .ref("chatMessage")
             .child(chatkey)
@@ -537,34 +572,125 @@ export function sendImage(event) {
   }
 }
 
-export function  showEmojipanel(){
-   document.getElementById("emojies").style.display = "block";
-   loadEmoji();
-   
+export function showEmojipanel() {
+  document.getElementById("emojies").style.display = "block";
+  loadEmoji();
 }
 
-export function hideEmojipanel(){
+export function hideEmojipanel() {
   document.getElementById("emojies").style.display = "none";
-
 }
 
-export function getEmoji(control){
-   
+export function getEmoji(control) {
   document.getElementById("inputmessage").value += control.innerHTML.trim();
-  
 }
 
-
-function loadEmoji(){
+function loadEmoji() {
   var Allemojies = "";
 
-  for(var i=128512;i<=129488;i++){
-    Allemojies += `<div class = "font-size-50px ArrangeEmojies" onclick = "getEmoji(this)">
+  for (var i = 128512; i <= 129488; i++) {
+    Allemojies += `<div class = "font-size-23px ArrangeEmojies" onclick = "getEmoji(this)">
     &#${i};
-  </div>` 
+  </div>`;
   }
- 
+
   document.getElementById("nav-home").innerHTML = Allemojies;
+}
+
+//  Recording audio implementation....
+let chunks = [];
+let recorder;
+
+export function record() {
+  document.getElementById("microphone").style.display = "none";
+  document.getElementById("pause-btn").style.display = "block";
+
+  let device = navigator.mediaDevices.getUserMedia({ audio: true });
+  device.then((stream) => {
+    if (recorder === undefined) {
+      recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+
+        if (recorder.state === "inactive") {
+          let blob = new Blob(chunks, { type: "audio/webm" });
+
+          var reader = new FileReader();
+          reader.addEventListener(
+            "load",
+            function () {
+              var chatmessage = {
+                currentuser: currentUserKey,
+                msg: reader.result,
+                dateTime: new Date().toLocaleString(),
+                msgtype: "audio",
+              };
+
+              if (chatkey !== "") {
+                firebasedb
+                  .ref("lastmsg")
+                  .child(chatkey)
+                  .set(chatmessage, function (error) {
+                    if (error) alert(error);
+                  });
+
+                firebasedb
+                  .ref("chatMessage")
+                  .child(chatkey)
+                  .push(chatmessage, function (error) {
+                    if (error) alert(error);
+                    else {
+                      document.getElementById("inputmessage").value = "";
+                      document.getElementById("inputmessage").focus();
+                    }
+                  });
+              }
+            },
+            false
+          );
+
+          reader.readAsDataURL(blob);
+        }
+      };
+
+      recorder.start(100);
+    }
+  });
+
+  if (recorder !== undefined) {
+    chunks = [];
+    recorder.start(100);
+  }
+}
+
+export function pause() {
+  document.getElementById("microphone").style.display = "block";
+  document.getElementById("pause-btn").style.display = "none";
+
+  if (recorder !== undefined) {
+    recorder.stop();
+  }
+}
+
+function getuser_dp(){
+  if(currentUserKey!==null){
+
   
+  firestore
+  .collection("users")
+  .doc(currentUserKey)
+  .get()
+  .then((docRef) => {
+    dp_url = docRef.data().profilepicture;
    
+    
+  })
+  .catch((error) => {
+     console.log(error)
+  })
+  
+
+  }
+
+
 }

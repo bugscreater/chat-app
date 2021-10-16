@@ -68,7 +68,7 @@ export default function Signup() {
             await user.sendEmailVerification();
             const isemailverified = user.emailVerification;
             await createUserDocument(user,{username});
-            history.push("/");
+            history.push("/profile");
            
 
 

@@ -65,6 +65,13 @@
     max-height: 15px;
 }
 
+.lastmessage-container{
+    font-size: 12px;
+    line-height: 15px;
+    max-height: 15px;
+
+}
+
 .cursor-pointer{
     cursor: pointer;
 }
@@ -181,7 +188,8 @@ i{
 }
 
 .fa-microphone{
-    font-size: 20px !important;
+    font-size: 25px !important;
+    cursor: pointer;
     
 }
 
@@ -241,15 +249,16 @@ textarea::-webkit-scrollbar{
 }
 
 .sentmsg{
+    max-width: 100% !important;
     background-color: whitesmoke;
     display: inline-block;
-    max-width: 100% !important;
     float: right !important;
     border-radius: 1rem;
     padding: 10px 15px;
     font-style: normal;
     font-size: inherit;
     margin: 3px !important;
+    margin-bottom: 3px !important; 
 }
 .card-height{
     height: 95vh !important;
@@ -443,20 +452,21 @@ textarea::-webkit-scrollbar{
 #emojies{
     background-color: white;
     height: 35vh;
-    margin-bottom: 5px;
     box-shadow: rgba(0,0,0,0.16) 0px 3px 6px ,rgba(0,0,0,0.23) 0px 3px 6px;
     display: none;
     cursor: pointer;
     user-select: none;
+    margin-bottom: 10px !important;
 
 }
 
-.font-size-50px{
-    font-size: 20px !important;
+.font-size-23px{
+    font-size: 23px !important;
 }
 
 #emoji{
     cursor: pointer;
+    padding: 5px !important;
 }
 
 .ArrangeEmojies{
@@ -464,8 +474,25 @@ textarea::-webkit-scrollbar{
     padding: 5px;
 }
 
+#pause-btn{
+    display: none;
+    font-size:  25px !important;
+    cursor: pointer;
+}
 
+#audio-msg{
+    height: 5vh !important;
+    width: 20vw !important;
+    padding: 0 !important;
+}
 
+.fa-paper-plane{
+   cursor: pointer;
+}
+.fa-image{
+  cursor: pointer;
+  font-size: 25px !important;
+}
 
 
 @media only screen and (max-width: 1000px) {
@@ -475,6 +502,7 @@ textarea::-webkit-scrollbar{
         top: 70px !important;
         bottom: 0 !important;
     }
+
 
     .card-header-modified{
         position:absolute;
@@ -593,6 +621,12 @@ textarea::-webkit-scrollbar{
     }
     .dropdown_menu{
         right: 5% !important;
+    }
+    #audio-msg{
+        height: 5vh !important;
+        display: inline-block;
+        width: 150px !important;
+        
     }
     
     

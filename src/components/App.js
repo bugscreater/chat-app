@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Signup from "../authentication/Signup";
 import { AuthProvider } from "../contexts/AuthContext";
 import {BrowserRouter as Router,Switch,Route,Redirect} from 'react-router-dom'
@@ -9,6 +9,7 @@ import Forgetpassword from "../authentication/Forgetpassword";
 import Privatechat from "./Privatechat";
 import Chatroom from "./Chatroom";
 import UpdateProfile from "../authentication/UpdateProfile";
+import firebase from "firebase";
 
 
 
@@ -16,8 +17,8 @@ import UpdateProfile from "../authentication/UpdateProfile";
 
 
 function App() {
- 
 
+  
   return (
     <AuthProvider>
      
