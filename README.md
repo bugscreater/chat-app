@@ -11,7 +11,9 @@ I have developed this web app using React.js and Firebase. Some key features of 
 8) Users can also share images and voice notes in order to enhance their conversation.
 9) There is no expiry of older conversation, but user can delete coversation explicitly.
 10) User will get a push notification, notifing new messages and friend requests.
-This app is being updated regularly and new features are added to enhance the exprience of the user.
+
+
+***This app is being updated regularly and new features are added to enhance the exprience of the user.***
 
 
 
